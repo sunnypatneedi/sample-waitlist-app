@@ -12,6 +12,10 @@ export default function WaitlistForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Reset previous messages
+    setMessage('');
+    
+    // Client-side validation
     if (!email) {
       setMessage('Please enter your email');
       setStatus('error');
@@ -25,7 +29,6 @@ export default function WaitlistForm() {
     }
 
     setStatus('loading');
-    setMessage('');
 
     try {
       const response = await fetch('/api/waitlist', {
@@ -39,15 +42,33 @@ export default function WaitlistForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        throw new Error(data.error || 'Failed to join waitlist. Please try again.');
       }
 
+      
+      // Success - show success state
       setStatus('success');
       setEmail('');
-      setMessage("You've been added to the waitlist! 🎉");
+      setMessage("You've been added to the waitlist! Check your email for confirmation. 🎉");
+      
+      // Reset form after 5 seconds
+      setTimeout(() => {
+        setStatus('idle');
+        setMessage('');
+      }, 5000);
+      
     } catch (error) {
+      console.error('Submission error:', error);
       setStatus('error');
-      setMessage(error instanceof Error ? error.message : 'Failed to join waitlist');
+      const errorMessage = error instanceof Error ? 
+        error.message : 'Failed to join waitlist. Please try again later.';
+      setMessage(errorMessage);
+      
+      // Clear error after 5 seconds
+      setTimeout(() => {
+        setStatus('idle');
+        setMessage('');
+      }, 5000);
     }
   };
 
