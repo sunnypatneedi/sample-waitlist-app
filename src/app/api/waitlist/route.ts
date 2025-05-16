@@ -51,24 +51,36 @@ export async function POST(request: Request) {
       throw new Error('No data returned from Resend API');
     }
 
-    // Send welcome email
-    const emailResponse = await resend.emails.send({
-      from: 'Waitlist <onboarding@resend.dev>',
-      to: email,
-      subject: 'You\'re on the waitlist!',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #4f46e5;">Welcome to our waitlist! 🎉</h1>
-          <p>Thank you for joining our waitlist. We'll be in touch soon with updates.</p>
-          <p>In the meantime, feel free to follow us on social media for the latest news.</p>
-          <p>Best,<br>The Team</p>
-        </div>
-      `,
-    }) as unknown as ResendResponse<{ id: string }>;
+    // For testing: Only send email to the owner's verified email
+    // In production, you would verify your domain and use your own email
+    const ownerEmail = 'sunnypatneedi@gmail.com';
+    const isTestEmail = email === ownerEmail;
+    let emailError = null;
+    
+    if (isTestEmail) {
+      const emailResponse = await resend.emails.send({
+        from: 'onboarding@resend.dev', // Must be a verified sender in Resend
+        to: ownerEmail,
+        subject: 'You\'re on the waitlist!',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #4f46e5;">Welcome to our waitlist! 🎉</h1>
+            <p>Thank you for joining our waitlist. We'll be in touch soon with updates.</p>
+            <p>Email submitted: ${email}</p>
+            <p>Best,<br>The Team</p>
+          </div>
+        `,
+      }) as unknown as ResendResponse<{ id: string }>;
+      
+      if (emailResponse.error) {
+        emailError = emailResponse.error;
+        console.error('Email sending error:', emailError);
+      }
+    } else {
+      console.log(`Skipping email to ${email} - only sending to verified email in test mode`);
+    }
 
-    if (emailResponse.error) {
-      console.error('Email sending error:', emailResponse.error);
-      // Log the error but don't fail the request
+    if (emailError) {
       console.log('Continuing despite email error...');
     }
 
