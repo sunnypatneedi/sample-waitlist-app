@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { withRateLimit } from '@/utils/rateLimit';
 
 // Initialize Resend with API key from environment variables
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -23,7 +24,7 @@ type ResendResponse<T> = {
   } | null;
 };
 
-export async function POST(request: Request) {
+export const POST = withRateLimit(async (request: Request) => {
   try {
     const { email } = await request.json();
 
@@ -98,24 +99,25 @@ export async function POST(request: Request) {
     
     // Handle API errors
     if (error instanceof Error) {
+      const status = 'status' in error && typeof error.status === 'number' ? error.status : 500;
       return NextResponse.json(
         { 
           error: error.message || 'Failed to process your request',
           details: process.env.NODE_ENV === 'development' ? error.stack : undefined
         },
-        { status: 500 }
+        { status }
       );
     }
 
     return NextResponse.json(
       { 
         error: 'Failed to process your request. Please try again.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? error : undefined
       },
       { status: 500 }
     );
   }
-}
+});
 
 // TypeScript types for the request/response
 type WaitlistRequest = {

@@ -5,8 +5,11 @@
 [build.environment]
   # Disable Next.js telemetry in CI
   NEXT_TELEMETRY_DISABLED = "1"
-  # Node.js version
-  NODE_VERSION = "18.x"
+  # Node.js version (must be a specific version for Netlify)
+  NODE_VERSION = "18.20.2"
+  # Required environment variables (set these in Netlify dashboard)
+  # RESEND_API_KEY=your_resend_api_key
+  # RESEND_AUDIENCE_ID=your_audience_id
 
 # Required for Next.js SSR/ISR support
 [[plugins]]
