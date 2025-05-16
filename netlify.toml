@@ -1,0 +1,67 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Disable Next.js telemetry in CI
+  NEXT_TELEMETRY_DISABLED = "1"
+  # Node.js version
+  NODE_VERSION = "18.x"
+
+# Required for Next.js SSR/ISR support
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirect all requests to the main entry point
+# This is required for client-side routing to work
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Cache settings for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Cache static assets for 1 year
+    Cache-Control = "public, max-age=31536000, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; connect-src 'self' https:;"
+
+# Environment variables (these should be set in Netlify UI for security)
+# [build.environment]
+#   RESEND_API_KEY = "your_resend_api_key_here"
+#   RESEND_AUDIENCE_ID = "your_audience_id_here"
+
+# Build settings for Next.js
+[build.processing]
+  skip_processing = true
+
+# Enable pretty URLs (removes .html)
+[[redirects]]
+  from = "/:file"
+  to = "/:file.html"
+  status = 200
+  force = false
+  conditions = {Language = ["en"], Country = []}
+
+# Handle 404s for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+  force = false
+
+# API proxy if needed (uncomment and modify if using API routes)
+# [[redirects]]
+#   from = "/api/*"
+#   to = "/.netlify/functions/:splat"
+#   status = 200
