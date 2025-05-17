@@ -6,12 +6,6 @@
 
 A modern, open-source waitlist application built with Next.js and Resend for collecting email signups with a beautiful UI and confetti celebration. Perfect for your next product launch or beta program.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/sunnypatneedi/sample-waitlist-app/)
-
-A modern, open-source waitlist application built with Next.js and Resend for collecting email signups with a beautiful UI and confetti celebration. Perfect for your next product launch or beta program.
-
 ## ✨ Features
 
 ### Email Management with Resend
